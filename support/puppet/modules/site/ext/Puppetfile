@@ -1,0 +1,62 @@
+forge 'http://forge.puppetlabs.com'
+
+mod 'puppet',
+  :git => 'https://github.com/jtopjian/puppet-puppet'
+
+mod 'apache',
+  :git => 'https://github.com/puppetlabs/puppetlabs-apache'
+
+mod 'concat',
+  :git => 'https://github.com/puppetlabs/puppetlabs-concat'
+
+mod 'puppetdb',
+  :git => 'https://github.com/puppetlabs/puppetlabs-puppetdb'
+
+mod 'postgresql',
+  :git => 'https://github.com/puppetlabs/puppetlabs-postgresql'
+
+mod 'firewall',
+  :git => 'https://github.com/puppetlabs/puppetlabs-firewall'
+
+mod 'stdlib',
+  :git => 'https://github.com/puppetlabs/puppetlabs-stdlib'
+
+mod 'inifile',
+  :git => 'https://github.com/puppetlabs/puppetlabs-inifile'
+
+mod 'cubbystack',
+  :git => 'https://github.com/jtopjian/puppet-cubbystack'
+
+mod 'icehouse',
+  :git => 'https://github.com/jtopjian/puppet-icehouse'
+
+mod 'apt',
+  :git => 'https://github.com/puppetlabs/puppetlabs-apt'
+
+mod 'mysql',
+  :git => 'https://github.com/puppetlabs/puppetlabs-mysql'
+
+mod 'memcached',
+  :git => 'https://github.com/saz/puppet-memcached'
+
+mod 'sysctl',
+  :git => 'https://github.com/puppetlabs/puppetlabs-sysctl'
+
+mod 'rabbitmq',
+  :git => 'https://github.com/puppetlabs/puppetlabs-rabbitmq',
+  :ref => '2.x'
+
+mod 'xinetd',
+  :git => 'https://github.com/puppetlabs/puppetlabs-xinetd'
+
+mod 'rsync',
+  :git => 'https://github.com/puppetlabs/puppetlabs-rsync'
+
+mod 'swift',
+  :git => 'https://github.com/stackforge/puppet-swift'
+
+mod 'keystone',
+  :git => 'https://github.com/stackforge/puppet-keystone'
+
+mod 'l2mesh',
+  :git => 'https://github.com/jtopjian/l2mesh'

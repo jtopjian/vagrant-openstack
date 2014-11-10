@@ -1,0 +1,385 @@
+########## Puppet
+
+puppet::package_ensure: '3.6.2-1puppetlabs1'
+puppet::settings:
+  server: 'puppet'
+  parser: 'future'
+  evaluator: 'current'
+  ordering: 'manifest'
+  pluginsync: true
+  logdir: '/var/log/puppet'
+  vardir: '/var/lib/puppet'
+  ssldir: '/var/lib/puppet/ssl'
+  rundir: '/var/run/puppet'
+  manifest: '/etc/puppet/modules/site/manifests/site.pp'
+
+puppet::agent::settings:
+  certname: "%{::fqdn}"
+  show_diff: true
+  splay: false
+  configtimeout: 360
+  usecacheonfailure: true
+  report: true
+  environment: "%{::environment}"
+
+puppet::master::package_ensure: '3.6.2-1puppetlabs1'
+puppet::master::servertype: 'passenger'
+puppet::master::settings:
+  ca: true
+  ssldir: '/var/lib/puppet/ssl'
+
+######### OpenStack Configuration
+
+openstack::region: 'RegionOne'
+openstack::cloud_controller: 'cloud'
+openstack::swift_proxy: 'swift'
+
+######## Users
+
+openstack::users:
+  nova:
+    uid: 999
+    gid: 999
+  glance:
+    uid: 998
+    gid: 998
+  keystone:
+    uid: 997
+    gid: 997
+  cinder:
+    uid: 996
+    gid: 996
+  swift:
+    uid: 995
+    gid: 995
+  neutron:
+    uid: 994
+    gid: 994
+
+######## Networking
+
+network::external: '10.0.0.0/24'
+network::external::device: 'eth0'
+network::external::ip: "%{::ipaddress_eth0}"
+
+network::internal: '192.168.255.0/24'
+network::internal::device: 'tun0'
+network::internal::ip: "%{::ipaddress_tun0}"
+
+openstack::network::management: '10.0.0.0/24'
+openstack::network::management::device: 'eth0'
+openstack::network::management::ip: "%{::ipaddress_eth0}"
+
+######## MySQL
+
+openstack::mysql::root_password: 'password'
+openstack::mysql::allowed_hosts: ['127.0.0.%', '10.0.0.%']
+
+######## RabbitMQ
+
+openstack::rabbitmq::userid:   'nova'
+openstack::rabbitmq::password: 'password'
+
+######## Keystone
+
+openstack::keystone::mysql::password: 'password'
+openstack::keystone::admin::password: 'password'
+openstack::keystone::settings:
+  'DEFAULT/admin_token': 'password'
+  'DEFAULT/verbose': true
+  'DEFAULT/debug': true
+  'DEFAULT/use_syslog': true
+  'DEFAULT/syslog_log_facility': 'LOG_LOCAL2'
+  'DEFAULT/log_file': 'keystone.log'
+  'DEFAULT/log_dir': '/var/log/keystone'
+  'DEFAULT/log_config': '/etc/keystone/logging.conf'
+  'DEFAULT/public_bind_host': '::'
+  'DEFAULT/admin_bind_host': '::'
+  'database/connection': "mysql://keystone:%{hiera('openstack::keystone::mysql::password')}@%{hiera('openstack::cloud_controller')}/keystone"
+  'identity/driver': 'keystone.identity.backends.sql.Identity'
+  'catalog/driver': 'keystone.catalog.backends.templated.TemplatedCatalog'
+  'catalog/template_file': '/etc/keystone/default_catalog.templates'
+  'token/driver': 'keystone.token.backends.memcache.Token'
+  'token/expiration': 28800
+  'token/provider': 'keystone.token.providers.uuid.Provider'
+  'policy/driver': 'keystone.policy.backends.rules.Policy'
+  'ec2/driver': 'keystone.contrib.ec2.backends.sql.Ec2'
+  'signing/token_format': 'UUID'
+
+######## Glance
+
+openstack::glance::mysql::password: 'password'
+openstack::glance::keystone::password: 'password'
+openstack::glance::api::settings:
+  'DEFAULT/verbose': true
+  'DEFAULT/debug': true
+  'DEFAULT/log_dir': '/var/log/glance'
+  'DEFAULT/log_file': '/var/log/glance/api.log'
+  'DEFAULT/default_store': 'file'
+  'DEFAULT/use_syslog': true
+  'DEFAULT/syslog_log_facility': 'LOG_LOCAL1'
+  'DEFAULT/backlog': 4096
+  'DEFAULT/workers': "%{::processorcount}"
+  'DEFAULT/image_cache_dir': '/var/lib/glance/image-cache/'
+  'DEFAULT/bind_host': '::'
+  'database/connection': "mysql://glance:%{hiera('openstack::glance::mysql::password')}@%{hiera('openstack::cloud_controller')}/glance"
+  'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'keystone_authtoken/auth_port': 35357
+  'keystone_authtoken/auth_protocol': 'http'
+  'keystone_authtoken/admin_tenant_name': 'services'
+  'keystone_authtoken/admin_user': 'glance'
+  'keystone_authtoken/admin_password': "%{hiera('openstack::glance::keystone::password')}"
+  'paste_deploy/flavor': 'keystone'
+openstack::glance::cache::settings:
+  'DEFAULT/use_syslog': true
+  'DEFAULT/syslog_log_facility': 'LOG_LOCAL1'
+  'DEFAULT/log_dir': '/var/log/glance'
+  'DEFAULT/log_file': '/var/log/glance/cache.log'
+  'DEFAULT/image_cache_dir': '/var/lib/glance/image-cache/'
+  'DEFAULT/filesystem_store_datadir': '/var/lib/glance/images/'
+  'DEFAULT/auth_url': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0/"
+  'DEFAULT/admin_tenant_name': 'services'
+  'DEFAULT/admin_user': 'glance'
+  'DEFAULT/admin_password': "%{hiera('openstack::glance::keystone::password')}"
+openstack::glance::registry::settings:
+  'DEFAULT/use_syslog': true
+  'DEFAULT/syslog_log_facility': 'LOG_LOCAL1'
+  'DEFAULT/log_dir': '/var/log/glance'
+  'DEFAULT/log_file': '/var/log/glance/registry.log'
+  'DEFAULT/backlog': 4096
+  'DEFAULT/limit_param_default': 25
+  'database/connection': "mysql://glance:%{hiera('openstack::glance::mysql::password')}@%{hiera('openstack::cloud_controller')}/glance"
+  'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'keystone_authtoken/auth_port': '35357'
+  'keystone_authtoken/auth_protocol': 'http'
+  'keystone_authtoken/admin_tenant_name': 'services'
+  'keystone_authtoken/admin_user': 'glance'
+  'keystone_authtoken/admin_password': "%{hiera('openstack::glance::keystone::password')}"
+  'paste_deploy/flavor': 'keystone'
+
+######## Cinder
+
+openstack::cinder::mysql::password: 'password'
+openstack::cinder::keystone::password: 'password'
+openstack::cinder::settings:
+  'DEFAULT/debug': true
+  'DEFAULT/verbose': true
+  'DEFAULT/use_syslog': true
+  'DEFAULT/syslog_log_facility': 'LOG_LOCAL3'
+  'DEFAULT/state_path': '/var/lib/cinder'
+  'DEFAULT/log_dir': '/var/log/cinder'
+  'DEFAULT/rootwrap_config': '/etc/cinder/rootwrap.conf'
+  'DEFAULT/api_paste_config': '/etc/cinder/api-paste.ini'
+  'DEFAULT/auth_strategy': 'keystone'
+  'DEFAULT/volumes_dir': '/var/lib/cinder/volumes'
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+  'DEFAULT/glance_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/volumes_dir': '/var/lib/cinder/volumes'
+  'DEFAULT/osapi_volume_listen': '::'
+  'database/connection': "mysql://cinder:%{hiera('openstack::cinder::mysql::password')}@%{hiera('openstack::cloud_controller')}/cinder"
+  'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'keystone_authtoken/auth_port': '35357'
+  'keystone_authtoken/auth_protocol': 'http'
+  'keystone_authtoken/admin_tenant_name': 'services'
+  'keystone_authtoken/admin_user': 'cinder'
+  'keystone_authtoken/admin_password': "%{hiera('openstack::cinder::keystone::password')}"
+
+######## Nova
+
+openstack::nova::mysql::password: 'password'
+openstack::nova::keystone::password: 'password'
+openstack::nova::keystone::tenant_id: 'fd1ad3a71644490481420eada5c1fe6a'
+openstack::nova::compute::libvirt_type: 'kvm'
+openstack::nova::settings:
+  'DEFAULT/verbose': true
+  'DEFAULT/debug': true
+  'DEFAULT/use_syslog': true
+  'DEFAULT/syslog_log_facility': 'LOG_LOCAL0'
+  'DEFAULT/log_dir': '/var/log/nova'
+  'DEFAULT/state_path': '/var/lib/nova'
+  'DEFAULT/lock_path': '/var/lock/nova'
+  'DEFAULT/auth_strategy': 'keystone'
+  'DEFAULT/rootwrap_config': '/etc/nova/rootwrap.conf'
+  'DEFAULT/glance_api_servers': "%{hiera('openstack::cloud_controller')}:9292"
+  'DEFAULT/api_paste_config': '/etc/nova/api-paste.ini'
+  'DEFAULT/sql_connection': "mysql://nova:%{hiera('openstack::nova::mysql::password')}@%{hiera('openstack::cloud_controller')}/nova"
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+  'DEFAULT/novncproxy_base_url': "http://%{hiera('openstack::cloud_controller')}:6080/vnc_auto.html"
+  'DEFAULT/novncproxy_host': '::'
+  'DEFAULT/instance_usage_audit_period': 'hour'
+  'DEFAULT/instance_usage_audit': true
+  'DEFAULT/service_neutron_metadata_proxy': true
+  'DEFAULT/neutron_metadata_proxy_shared_secret': 'password'
+  'DEFAULT/network_api_class': 'nova.network.neutronv2.api.API'
+  'DEFAULT/neutron_admin_username': 'neutron'
+  'DEFAULT/neutron_admin_password': "%{hiera('openstack::neutron::keystone::password')}"
+  'DEFAULT/neutron_admin_auth_url': "http://%{hiera('openstack::cloud_controller')}:35357/v2.0/"
+  'DEFAULT/neutron_admin_tenant_name': 'services'
+  'DEFAULT/neutron_url': "http://%{hiera('openstack::cloud_controller')}:9696/"
+  'DEFAULT/libvirt_vif_driver': 'nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver'
+  'DEFAULT/firewall_driver': 'nova.virt.firewall.NoopFirewallDriver'
+  'DEFAULT/security_group_api': 'neutron'
+  'DEFAULT/neutron_region_name': 'RegionOne'
+  'DEFAULT/connection_type': 'libvirt'
+  'DEFAULT/compute_driver': 'libvirt.LibvirtDriver'
+  'DEFAULT/ec2_listen': '::'
+  'DEFAULT/osapi_compute_listen': '::'
+  'DEFAULT/metadata_listen': '::'
+  'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'keystone_authtoken/auth_port': 35357
+  'keystone_authtoken/auth_protocol': 'http'
+  'keystone_authtoken/admin_tenant_name': 'services'
+  'keystone_authtoken/admin_user': 'nova'
+  'keystone_authtoken/admin_password': "%{hiera('openstack::nova::keystone::password')}"
+
+######## Neutron
+
+openstack::neutron::mysql::password: 'password'
+openstack::neutron::keystone::password: 'password'
+openstack::neutron::settings:
+  'DEFAULT/verbose': true
+  'DEFAULT/state_path': '/var/lib/neutron'
+  'DEFAULT/lock_path': '$state_path/lock'
+  'DEFAULT/allow_overlapping_ips': 'true'
+  'DEFAULT/core_plugin': 'neutron.plugins.ml2.plugin.Ml2Plugin'
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+  'DEFAULT/notification_driver': 'neutron.openstack.common.notifier.rpc_notifier'
+  'DEFAULT/bind_host': '::'
+  'DEFAULT/service_plugins': 'router,firewall'
+  'DEFAULT/notify_nova_on_port_status_changes': True
+  'DEFAULT/notify_nova_on_port_data_changes': True
+  'DEFAULT/nova_url': "http://%{hiera('openstack::cloud_controller')}:8774/v2"
+  'DEFAULT/nova_admin_auth_url': "http://%{hiera('openstack::cloud_controller')}:35357/v2.0"
+  'DEFAULT/nova_region_name': "%{hiera('openstack::region')}"
+  'DEFAULT/nova_admin_username': 'nova'
+  'DEFAULT/nova_admin_tenant_id': "%{hiera('openstack::nova::keystone::tenant_id')}"
+  'DEFAULT/nova_admin_password': "%{hiera('openstack::nova::keystone::password')}"
+  'database/connection': "mysql://neutron:%{hiera('openstack::neutron::mysql::password')}@%{hiera('openstack::cloud_controller')}/neutron"
+  'agent/root_helper': 'sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf'
+  'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'keystone_authtoken/auth_port': '35357'
+  'keystone_authtoken/auth_protocol': 'http'
+  'keystone_authtoken/admin_tenant_name': 'services'
+  'keystone_authtoken/admin_user': 'neutron'
+  'keystone_authtoken/admin_password': 'password'
+  'keystone_authtoken/signing_dir': '$state_path/keystone-signing'
+openstack::neutron::dhcp::settings:
+  'DEFAULT/interface_driver': 'neutron.agent.linux.interface.BridgeInterfaceDriver'
+  'DEFAULT/dhcp_driver': 'neutron.agent.linux.dhcp.Dnsmasq'
+  'DEFAULT/use_namespaces': 'true'
+  'DEFAULT/dhcp_delete_namespaces': true
+openstack::neutron::l3::settings:
+  'DEFAULT/interface_driver': 'neutron.agent.linux.interface.BridgeInterfaceDriver'
+  'DEFAULT/use_namespaces': 'true'
+openstack::neutron::metadata::settings:
+  'DEFAULT/auth_url': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
+  'DEFAULT/auth_region': 'RegionOne'
+  'DEFAULT/admin_tenant_name': 'services'
+  'DEFAULT/admin_user': 'neutron'
+  'DEFAULT/admin_password': "%{hiera('openstack::neutron::keystone::password')}"
+  'DEFAULT/nova_metadata_ip': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/metadata_proxy_shared_secret': 'password'
+openstack::neutron::plugins::ml2::settings:
+  'ml2/type_drivers': 'vxlan'
+  'ml2/mechanism_drivers': 'linuxbridge'
+  #'ml2/mechanism_drivers': 'openvswitch'
+  'ml2/tenant_network_types': 'vxlan'
+  'ml2_type_vxlan/vni_ranges': '1000:1050'
+  'securitygroup/firewall_driver': 'neutron.agent.linux.iptables_firewall.IptablesFirewallDriver'
+  #'securitygroup/firewall_driver': 'neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver'
+  'vxlan/enable_vxlan': True
+  'vxlan/l2_population': False
+  #'ovs/tunnel_type': 'vxlan'
+  #'ovs/tenant_network_type': 'vxlan'
+  #'ovs/tunnel_id_ranges': '1000:1050'
+  #'ovs/enable_tunneling': True
+  'agent/veth_mtu': 1490
+  #'agent/tunnel_types': 'vxlan'
+  #'agent/l2_population': False
+
+######## Swift
+
+# Swift settings
+openstack::swift::swift_part_power: 10
+openstack::swift::swift_replicas: 2
+openstack::swift::swift_min_part_hours: 1
+openstack::swift::disks:
+  - 'vdb'
+openstack::swift::settings:
+  'swift-hash/swift_hash_path_prefix': 'foo'
+  'swift-hash/swift_hash_path_suffix': 'bar'
+openstack::swift::account::settings:
+  'DEFAULT/devices': '/srv/node'
+  'DEFAULT/bind_port': 6002
+  'DEFAULT/mount_check': 'false'
+  'DEFAULT/user': 'swift'
+  'DEFAULT/log_facility': 'LOG_LOCAL2'
+  'DEFAULT/workers': 1
+  'pipeline:main/pipeline': 'recon account-server'
+  'app:account-server/use': 'egg:swift#account'
+  'account-replicator/concurrency': "%{::processorcount}"
+  'account-reaper/concurrency': "%{::processorcount}"
+  'filter:recon/use': 'egg:swift#recon'
+  'filter:recon/recon_cache_path':  '/var/cache/swift'
+openstack::swift::container::settings:
+  'DEFAULT/devices': '/srv/node'
+  'DEFAULT/bind_port': 6001
+  'DEFAULT/mount_check': 'false'
+  'DEFAULT/user': 'swift'
+  'DEFAULT/log_facility': 'LOG_LOCAL2'
+  'DEFAULT/workers': 1
+  'DEFAULT/allowed_sync_hosts': '127.0.0.1'
+  'pipeline:main/pipeline': 'recon container-server'
+  'app:container-server/use': 'egg:swift#container'
+  'container-replicator/concurrency': "%{::processorcount}"
+  'container-updater/concurrency': "%{::processorcount}"
+  'filter:recon/use': 'egg:swift#recon'
+  'filter:recon/recon_cache_path':    '/var/cache/swift'
+openstack::swift::object::settings:
+  'DEFAULT/devices': '/srv/node'
+  'DEFAULT/bind_port': 6000
+  'DEFAULT/mount_check': 'false'
+  'DEFAULT/user': 'swift'
+  'DEFAULT/log_facility': 'LOG_LOCAL2'
+  'DEFAULT/workers': 1
+  'pipeline:main/pipeline': 'recon object-server'
+  'app:object-server/use': 'egg:swift#object'
+  'object-replicator/concurrency': "%{::processorcount}"
+  'object-updater/concurrency': "%{::processorcount}"
+  'filter:recon/use': 'egg:swift#recon'
+openstack::swift::proxy::settings:
+  'DEFAULT/bind_port': '8080'
+  'DEFAULT/workers': "%{::processorcount}"
+  'DEFAULT/user': 'swift'
+  'DEFAULT/log_level': 'DEBUG'
+  'pipeline:main/pipeline': 'healthcheck cache staticweb authtoken keystone proxy-logging proxy-server'
+  'app:proxy-server/use': 'egg:swift#proxy'
+  'app:proxy-server/allow_account_management': true
+  'app:proxy-server/account_autocreate': true
+  'filter:cache/use': 'egg:swift#memcache'
+  'filter:cache/memcache_servers': '127.0.0.1:11211'
+  'filter:healthcheck/use': 'egg:swift#healthcheck'
+  'filter:proxy-logging/use': 'egg:swift#proxy_logging'
+  'filter:swift3/use': 'egg:swift3#swift3'
+  'filter:account_quotas/use': 'egg:swift#account_quotas'
+  'filter:container_quotas/use': 'egg:swift#container_quotas'
+  'filter:keystone/use': 'egg:swift#keystoneauth'
+  'filter:keystone/operator_roles': 'admin, Member, swiftoperator'
+  'filter:keystone/is_admin': true
+  'filter:keystone/cache': 'swift.cache'
+  'filter:staticweb/use': 'egg:swift#staticweb'
+  'filter:authtoken/signing_dir': '/etc/swift/keystone'
+  'filter:authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'filter:authtoken/auth_port': '35357'
+  'filter:authtoken/auth_protocol': 'http'
+  'filter:authtoken/admin_tenant_name': 'services'
+  'filter:authtoken/admin_user': 'swift'
+  'filter:authtoken/admin_password': "%{hiera('openstack::swift::keystone::password')}"
+  'filter:swift3/use': "egg:swift3#swift3"
+  'filter:proxy-logging/use': 'egg:swift#proxy_logging'
