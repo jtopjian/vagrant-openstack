@@ -36,6 +36,9 @@ losetup /dev/loop0 /cinder-volumes.img
 pvcreate /dev/loop0
 vgcreate cinder-volumes /dev/loop0
 
+brctl addbr br-int
+brctl addbr br-ex
+
 for i in /etc/init/glance-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/nova-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/cinder-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
@@ -54,3 +57,5 @@ nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
 nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
 
 apt-get purge -y openstack-dashboard-ubuntu-theme
+
+keystone tenant-list | grep services

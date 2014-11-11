@@ -1,4 +1,14 @@
-########## Puppet
+# Networking
+
+network::external: '10.0.0.0/24'
+network::external::device: 'eth0'
+network::external::ip: "%{::ipaddress_eth0}"
+
+network::internal: '192.168.255.0/24'
+network::internal::device: 'tun0'
+network::internal::ip: "%{::ipaddress_tun0}"
+
+# Puppet
 
 puppet::package_ensure: '3.6.2-1puppetlabs1'
 puppet::settings:
@@ -28,13 +38,20 @@ puppet::master::settings:
   ca: true
   ssldir: '/var/lib/puppet/ssl'
 
-######### OpenStack Configuration
+# SSH
+
+ssh::allow_root_access:
+  - 'puppet.example.com'
+  - 'cloud.example.com'
+  - 'st2.example.com'
+
+# OpenStack Configuration
 
 openstack::region: 'RegionOne'
 openstack::cloud_controller: 'cloud'
 openstack::swift_proxy: 'swift'
 
-######## Users
+## Users
 
 openstack::users:
   nova:
@@ -62,31 +79,23 @@ openstack::users:
     uid: 992
     gid: 992
 
-######## Networking
-
-network::external: '10.0.0.0/24'
-network::external::device: 'eth0'
-network::external::ip: "%{::ipaddress_eth0}"
-
-network::internal: '192.168.255.0/24'
-network::internal::device: 'tun0'
-network::internal::ip: "%{::ipaddress_tun0}"
+## Networking
 
 openstack::network::management: '10.0.0.0/24'
 openstack::network::management::device: 'eth0'
 openstack::network::management::ip: "%{::ipaddress_eth0}"
 
-######## MySQL
+## MySQL
 
 openstack::mysql::root_password: 'password'
 openstack::mysql::allowed_hosts: ['127.0.0.%', '10.0.0.%']
 
-######## RabbitMQ
+## RabbitMQ
 
 openstack::rabbitmq::userid:   'nova'
 openstack::rabbitmq::password: 'password'
 
-######## Keystone
+## Keystone
 
 openstack::keystone::mysql::password: 'password'
 openstack::keystone::admin::password: 'password'
@@ -112,7 +121,7 @@ openstack::keystone::settings:
   'ec2/driver': 'keystone.contrib.ec2.backends.sql.Ec2'
   'signing/token_format': 'UUID'
 
-######## Glance
+## Glance
 
 openstack::glance::mysql::password: 'password'
 openstack::glance::keystone::password: 'password'
@@ -163,7 +172,7 @@ openstack::glance::registry::settings:
   'keystone_authtoken/admin_password': "%{hiera('openstack::glance::keystone::password')}"
   'paste_deploy/flavor': 'keystone'
 
-######## Cinder
+## Cinder
 
 openstack::cinder::mysql::password: 'password'
 openstack::cinder::keystone::password: 'password'
@@ -193,11 +202,11 @@ openstack::cinder::settings:
   'keystone_authtoken/admin_user': 'cinder'
   'keystone_authtoken/admin_password': "%{hiera('openstack::cinder::keystone::password')}"
 
-######## Nova
+## Nova
 
 openstack::nova::mysql::password: 'password'
 openstack::nova::keystone::password: 'password'
-openstack::nova::keystone::tenant_id: 'fd1ad3a71644490481420eada5c1fe6a'
+openstack::nova::keystone::tenant_id: '435df89a184548ff90d0e12de45cf243'
 openstack::nova::compute::libvirt_type: 'kvm'
 openstack::nova::settings:
   'DEFAULT/verbose': true
@@ -243,7 +252,7 @@ openstack::nova::settings:
   'keystone_authtoken/admin_user': 'nova'
   'keystone_authtoken/admin_password': "%{hiera('openstack::nova::keystone::password')}"
 
-######## Neutron
+## Neutron
 
 openstack::neutron::mysql::password: 'password'
 openstack::neutron::keystone::password: 'password'
@@ -310,9 +319,8 @@ openstack::neutron::plugins::ml2::settings:
   #'agent/tunnel_types': 'vxlan'
   #'agent/l2_population': False
 
-######## Swift
+## Swift
 
-# Swift settings
 openstack::swift::swift_part_power: 10
 openstack::swift::swift_replicas: 2
 openstack::swift::swift_min_part_hours: 1
@@ -391,7 +399,7 @@ openstack::swift::proxy::settings:
   'filter:swift3/use': "egg:swift3#swift3"
   'filter:proxy-logging/use': 'egg:swift#proxy_logging'
 
-######## Heat
+## Heat
 
 openstack::heat::mysql::password: 'password'
 openstack::heat::keystone::password: 'password'
@@ -414,7 +422,7 @@ openstack::heat::settings:
   'keystone_authtoken/admin_password': "%{hiera('openstack::heat::keystone::password')}"
   'ec2authtoken/auth_uri': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
 
-######## Trove
+## Trove
 
 openstack::trove::mysql::password: 'password'
 openstack::trove::keystone::password: 'password'

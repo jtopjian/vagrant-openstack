@@ -1,4 +1,4 @@
-node /puppet/ {
+node /puppet./ {
   include site::roles::puppet_master
 }
 
@@ -12,4 +12,8 @@ node /c01/ {
 
 node /c02/ {
   include site::roles::compute_node
+}
+
+node /st2/ {
+  include site::profiles::base
 }

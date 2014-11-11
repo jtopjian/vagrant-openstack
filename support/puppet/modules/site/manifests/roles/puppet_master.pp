@@ -3,7 +3,6 @@ class site::roles::puppet_master {
   contain apache
   contain apache::mod::ssl
   contain apache::mod::passenger
-  contain puppet
   contain puppet::master
   contain puppetdb
   contain puppetdb::master::config

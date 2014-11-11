@@ -60,3 +60,9 @@ mod 'keystone',
 
 mod 'l2mesh',
   :git => 'https://github.com/jtopjian/l2mesh'
+
+mod 'sshkeys',
+  :git => 'https://github.com/jtopjian/puppet-sshkeys'
+
+mod 'puppetdbquery',
+  :git => 'https://github.com/dalen/puppet-puppetdbquery'

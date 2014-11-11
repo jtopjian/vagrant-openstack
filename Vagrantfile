@@ -33,29 +33,37 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.hostmanager.include_offline = false
 
   config.vm.define 'launchpad' do |vm|
-    vm.vm.hostname = "launchpad.example.com"
+    vm.vm.hostname = 'launchpad.example.com'
     vm.vm.provision 'shell', inline: "echo launchpad > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
     vm.vm.provision 'shell', path: 'bootstraps/launchpad.sh'
   end
 
   config.vm.define 'puppet' do |vm|
-    vm.vm.hostname = "puppet.example.com"
+    vm.vm.hostname = 'puppet.example.com'
     vm.hostmanager.aliases = ['puppet']
     vm.vm.provision 'shell', inline: "echo puppet > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
     vm.vm.provision 'shell', path: 'bootstraps/puppet.sh'
   end
 
+  config.vm.define 'st2' do |vm|
+    vm.vm.hostname = 'st2.example.com'
+    vm.hostmanager.aliases = ['st2']
+    vm.vm.provision 'shell', inline: 'echo st2 > /etc/hostname; hostname -F /etc/hostname'
+    vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', path: 'bootstraps/st2.sh'
+  end
+
   config.vm.define 'cloud' do |vm|
-    vm.vm.hostname = "cloud.example.com"
+    vm.vm.hostname = 'cloud.example.com'
     vm.hostmanager.aliases = ['cloud']
     vm.vm.provision 'shell', inline: "echo cloud > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
   end
 
   config.vm.define 'c01' do |vm|
-    vm.vm.hostname = "c01.example.com"
+    vm.vm.hostname = 'c01.example.com'
     vm.hostmanager.aliases = ['c01']
     vm.vm.provider :openstack do |os|
       os.flavor = 'm1.medium'
@@ -65,7 +73,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define 'c02' do |vm|
-    vm.vm.hostname = "c02.example.com"
+    vm.vm.hostname = 'c02.example.com'
     vm.hostmanager.aliases = ['c02']
     vm.vm.provider :openstack do |os|
       os.flavor = 'm1.medium'
