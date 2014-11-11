@@ -58,6 +58,9 @@ openstack::users:
   heat:
     uid: 993
     gid: 993
+  trove:
+    uid: 992
+    gid: 992
 
 ######## Networking
 
@@ -181,6 +184,7 @@ openstack::cinder::settings:
   'DEFAULT/glance_host': "%{hiera('openstack::cloud_controller')}"
   'DEFAULT/volumes_dir': '/var/lib/cinder/volumes'
   'DEFAULT/osapi_volume_listen': '::'
+  'DEFAULT/volume_clear': 'none'
   'database/connection': "mysql://cinder:%{hiera('openstack::cinder::mysql::password')}@%{hiera('openstack::cloud_controller')}/cinder"
   'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
   'keystone_authtoken/auth_port': '35357'
@@ -409,3 +413,61 @@ openstack::heat::settings:
   'keystone_authtoken/admin_user': 'heat'
   'keystone_authtoken/admin_password': "%{hiera('openstack::heat::keystone::password')}"
   'ec2authtoken/auth_uri': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
+
+######## Trove
+
+openstack::trove::mysql::password: 'password'
+openstack::trove::keystone::password: 'password'
+openstack::trove::settings:
+  'DEFAULT/verbose': True
+  'DEFAULT/debug': True
+  'DEFAULT/log_dir': '/var/log/trove'
+  'DEFAULT/bind_host': '::'
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+  'DEFAULT/sql_connection': "mysql://trove:%{hiera('openstack::trove::mysql::password')}@%{hiera('openstack::cloud_controller')}/trove"
+  'DEFAULT/trove_auth_url': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
+  'DEFAULT/nova_compute_url': "http://%{hiera('openstack::cloud_controller')}:8774/v2"
+  'DEFAULT/cinder_url': "http://%{hiera('openstack::cloud_controller')}:8776/v1"
+  'DEFAULT/swift_url': "http://%{hiera('openstack::cloud_controller')}:8080/v1/AUTH_"
+  'DEFAULT/trove_volume_support': True
+  'DEFAULT/block_device_mapping': 'vdb'
+  'DEFAULT/device_path': '/dev/vdb'
+  'DEFAULT/default_datastore': 'mysql'
+openstack::trove::taskmanager::settings:
+  'DEFAULT/verbose': True
+  'DEFAULT/debug': True
+  'DEFAULT/log_dir': '/var/log/trove'
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+  'DEFAULT/sql_connection': "mysql://trove:%{hiera('openstack::trove::mysql::password')}@%{hiera('openstack::cloud_controller')}/trove"
+  'DEFAULT/trove_auth_url': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
+  'DEFAULT/nova_compute_url': "http://%{hiera('openstack::cloud_controller')}:8774/v2"
+  'DEFAULT/cinder_url': "http://%{hiera('openstack::cloud_controller')}:8776/v1"
+  'DEFAULT/swift_url': "http://%{hiera('openstack::cloud_controller')}:8080/v1/AUTH_"
+  'DEFAULT/trove_volume_support': True
+  'DEFAULT/block_device_mapping': 'vdb'
+  'DEFAULT/device_path': '/dev/vdb'
+  'DEFAULT/nova_proxy_admin_user': 'nova'
+  'DEFAULT/nova_proxy_admin_pass': "%{hiera('openstack::nova::keystone::password')}"
+  'DEFAULT/nova_proxy_admin_tenant_name': 'services'
+  'DEFAULT/cloudinit_location': '/etc/trove/cloudinit'
+  'DEFAULT/taskmanager_manager': 'trove.taskmanager.manager.Manager'
+openstack::trove::conductor::settings:
+  'DEFAULT/verbose': True
+  'DEFAULT/debug': True
+  'DEFAULT/log_dir': '/var/log/trove'
+  'DEFAULT/trove_auth_url': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
+  'DEFAULT/sql_connection': "mysql://trove:%{hiera('openstack::trove::mysql::password')}@%{hiera('openstack::cloud_controller')}/trove"
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+openstack::trove::api_paste::settings:
+  'filter:authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'filter:authtoken/auth_port': '35357'
+  'filter:authtoken/auth_protocol': 'http'
+  'filter:authtoken/admin_user': 'trove'
+  'filter:authtoken/admin_password': "%{hiera('openstack::trove::keystone::password')}"
+  'filter:authtoken/admin_tenant_name': 'services'

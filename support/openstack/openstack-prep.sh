@@ -23,16 +23,27 @@ keystone user-create --name neutron --pass password
 keystone user-role-add --user neutron --tenant services --role admin
 keystone user-create --name heat --pass password
 keystone user-role-add --user heat --tenant services --role admin
+keystone user-create --name trove --pass password
+keystone user-role-add --user trove --tenant services --role admin
 
 source /root/openrc
 
 wget http://download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_64-disk.img
 glance image-create --name CirrOS --disk-format qcow2 --container-format bare --is-public true < cirros-*
 
+dd if=/dev/zero of=/cinder-volumes.img bs=1M count=0 seek=10240
+losetup /dev/loop0 /cinder-volumes.img
+pvcreate /dev/loop0
+vgcreate cinder-volumes /dev/loop0
+
 for i in /etc/init/glance-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/nova-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/cinder-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/neutron-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
+for i in /etc/init/heat-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
+for i in /etc/init/trove-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
+
+sleep 10
 
 neutron net-create --shared default
 neutron subnet-create default --name default --allocation-pool start=192.168.1.100,end=192.168.1.200 192.168.1.0/24
