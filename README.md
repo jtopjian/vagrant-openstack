@@ -44,3 +44,7 @@ Instructions
 
         vagrant up --provider openstack c01
         vagrant up --provider openstack c02
+
+9. Deploy the `st2` instance that runs [StackStorm](http://stackstorm.com/):
+
+        vagrant up --provider openstack st2
