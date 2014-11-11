@@ -21,6 +21,8 @@ keystone user-create --name swift --pass password
 keystone user-role-add --user swift --tenant services --role admin
 keystone user-create --name neutron --pass password
 keystone user-role-add --user neutron --tenant services --role admin
+keystone user-create --name heat --pass password
+keystone user-role-add --user heat --tenant services --role admin
 
 source /root/openrc
 
@@ -39,3 +41,5 @@ neutron router-interface-add default default
 
 nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
 nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
+
+apt-get purge -y openstack-dashboard-ubuntu-theme

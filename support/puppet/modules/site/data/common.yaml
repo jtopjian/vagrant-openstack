@@ -55,6 +55,9 @@ openstack::users:
   neutron:
     uid: 994
     gid: 994
+  heat:
+    uid: 993
+    gid: 993
 
 ######## Networking
 
@@ -383,3 +386,26 @@ openstack::swift::proxy::settings:
   'filter:authtoken/admin_password': "%{hiera('openstack::swift::keystone::password')}"
   'filter:swift3/use': "egg:swift3#swift3"
   'filter:proxy-logging/use': 'egg:swift#proxy_logging'
+
+######## Heat
+
+openstack::heat::mysql::password: 'password'
+openstack::heat::keystone::password: 'password'
+openstack::heat::settings:
+  'DEFAULT/verbose': true
+  'DEFAULT/log_dir': '/var/log/heat'
+  'DEFAULT/bind_host': '::'
+  'DEFAULT/rabbit_host': "%{hiera('openstack::cloud_controller')}"
+  'DEFAULT/rabbit_userid': "%{hiera('openstack::rabbitmq::userid')}"
+  'DEFAULT/rabbit_password': "%{hiera('openstack::rabbitmq::password')}"
+  'DEFAULT/heat_metadata_server_url': "http://%{hiera('openstack::cloud_controller')}:8000"
+  'DEFAULT/heat_waitcondition_server_url': "http://%{hiera('openstack::cloud_controller')}:8000/v1/waitcondition"
+  'database/connection': "mysql://heat:%{hiera('openstack::heat::mysql::password')}@%{hiera('openstack::cloud_controller')}/heat"
+  'keystone_authtoken/auth_host': "%{hiera('openstack::cloud_controller')}"
+  'keystone_authtoken/auth_port': 35357
+  'keystone_authtoken/auth_protocol': 'http'
+  'keystone_authtoken/auth_uri': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
+  'keystone_authtoken/admin_tenant_name': 'services'
+  'keystone_authtoken/admin_user': 'heat'
+  'keystone_authtoken/admin_password': "%{hiera('openstack::heat::keystone::password')}"
+  'ec2authtoken/auth_uri': "http://%{hiera('openstack::cloud_controller')}:5000/v2.0"
