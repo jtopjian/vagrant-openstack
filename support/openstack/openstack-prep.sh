@@ -39,12 +39,17 @@ vgcreate cinder-volumes /dev/loop0
 brctl addbr br-int
 brctl addbr br-ex
 
+# Get the services UUID to replace it with something standard
+SERVICES_UUID=$(keystone tenant-list | grep services | awk '{print $2}')
+mysqldump --opt --all-databases --events > cloud.sql
+sed -i -e "s/${SERVICES_UUID}/deadbeefc0ffeedeadbeefc0ffee0001/g" cloud.sql
+mysql < cloud.sql
+
 for i in /etc/init/glance-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/nova-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/cinder-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/neutron-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 for i in /etc/init/heat-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
-for i in /etc/init/trove-*; do basename $i | service $(sed -e 's/.conf//g') restart; done
 
 sleep 10
 
@@ -57,5 +62,3 @@ nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
 nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
 
 apt-get purge -y openstack-dashboard-ubuntu-theme
-
-keystone tenant-list | grep services

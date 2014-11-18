@@ -30,21 +30,11 @@ Instructions
         vagrant ssh cloud
         sudo bash /vagrant/support/openstack/openstack-prep.sh
 
-6. Get the UUID of the `services` project and add it to Hiera:
-
-        source openrc
-        keystone tenant-list | grep services
-        (edit `/etc/puppet/modules/site/data/common.yaml`)
-
-7. Re-run puppet:
-
-        puppet agent -t
-
-8. Deploy the compute nodes:
+6. Deploy the compute nodes:
 
         vagrant up --provider openstack c01
         vagrant up --provider openstack c02
 
-9. Deploy the `st2` instance that runs [StackStorm](http://stackstorm.com/):
+7. Deploy the `st2` instance that runs [StackStorm](http://stackstorm.com/):
 
         vagrant up --provider openstack st2
