@@ -206,7 +206,7 @@ openstack::cinder::settings:
 
 openstack::nova::mysql::password: 'password'
 openstack::nova::keystone::password: 'password'
-openstack::nova::keystone::tenant_id: '435df89a184548ff90d0e12de45cf243'
+openstack::nova::keystone::tenant_id: 'deadbeefc0ffeedeadbeefc0ffee0001'
 openstack::nova::compute::libvirt_type: 'kvm'
 openstack::nova::settings:
   'DEFAULT/verbose': true

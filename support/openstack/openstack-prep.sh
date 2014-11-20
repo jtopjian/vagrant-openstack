@@ -6,7 +6,7 @@ export OS_SERVICE_TOKEN=password
 export OS_SERVICE_ENDPOINT=http://localhost:35357/v2.0
 keystone user-create --name admin --pass password
 keystone tenant-create --name admin
-keystone role-create --name Member
+keystone role-create --name _member_
 keystone role-create --name admin
 keystone role-create --name ResellerAdmin
 keystone user-role-add --user admin --tenant admin --role admin
