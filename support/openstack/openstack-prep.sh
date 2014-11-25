@@ -29,7 +29,7 @@ keystone user-role-add --user trove --tenant services --role admin
 source /root/openrc
 
 wget http://download.cirros-cloud.net/0.3.3/cirros-0.3.3-x86_64-disk.img
-glance image-create --name CirrOS --disk-format qcow2 --container-format bare --is-public true < cirros-*
+openstack image create --disk_format qcow2 --container-format bare CirrOS < cirros-*
 
 dd if=/dev/zero of=/cinder-volumes.img bs=1M count=0 seek=10240
 losetup /dev/loop0 /cinder-volumes.img
@@ -53,12 +53,12 @@ for i in /etc/init/heat-*; do basename $i | service $(sed -e 's/.conf//g') resta
 
 sleep 10
 
-neutron net-create --shared default
-neutron subnet-create default --name default --allocation-pool start=192.168.1.100,end=192.168.1.200 192.168.1.0/24
-neutron router-create default
-neutron router-interface-add default default
+neutron --os-auth-url http://localhost:5000/v2.0/ net-create --shared default
+neutron --os-auth-url http://localhost:5000/v2.0/ subnet-create default --name default --allocation-pool start=192.168.1.100,end=192.168.1.200 192.168.1.0/24
+neutron --os-auth-url http://localhost:5000/v2.0/ router-create default
+neutron --os-auth-url http://localhost:5000/v2.0/ router-interface-add default default
 
-nova secgroup-add-rule default icmp -1 -1 0.0.0.0/0
-nova secgroup-add-rule default tcp 22 22 0.0.0.0/0
+openstack security group rule create --proto tcp --src-ip 0.0.0.0/0 --dst-port 22:22 default
+openstack security group rule create --proto icmp --src-ip 0.0.0.0/0 --dst-port -1 default
 
 apt-get purge -y openstack-dashboard-ubuntu-theme
