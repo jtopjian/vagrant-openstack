@@ -49,4 +49,5 @@ rm pdb.pp
 
 echo " ===> Installing Puppet Master Role"
 puppet apply --verbose /etc/puppet/modules/site/manifests/site.pp
+rm -rf /var/lib/puppet/l2mesh
 puppet agent -t

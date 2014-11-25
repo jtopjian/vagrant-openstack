@@ -16,7 +16,7 @@ sed -i "2i127.0.1.1 ${HOSTNAME}.example.com ${HOSTNAME}" /etc/hosts
 
 echo " ===> Installing base packages"
 apt-get update
-apt-get install -y curl wget git ruby
+apt-get install -y curl wget git ruby tinc
 
 echo " ===> Installing the Puppetlabs apt repo"
 wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
@@ -57,5 +57,6 @@ if [ "${HOSTNAME}" != "puppet" ]; then
   ssh root@puppet.example.com "puppet node deactivate ${FQDN}"
   puppet agent -t
   ssh root@puppet.example.com "puppet cert sign ${FQDN}"
+  puppet agent -t
   puppet agent -t
 fi
