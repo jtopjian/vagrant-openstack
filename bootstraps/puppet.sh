@@ -13,12 +13,13 @@ chmod -R 0600 /root/.ssh
 
 echo " ===> Configuring main Puppet manifest"
 sed -i '/\[main\]/a manifest=/etc/puppet/modules/site/manifests/site.pp' /etc/puppet/puppet.conf
-sed -i '/\[main\]/a parser=future' /etc/puppet/puppet.conf
-sed -i '/\[main\]/a evaluator=current' /etc/puppet/puppet.conf
 
-echo " ===> Copying main site puppet module"
-mkdir -p /etc/puppet/modules
-cp -a /vagrant/support/puppet/modules/site /etc/puppet/modules
+echo " ===> Installing Librarian Puppet Simple"
+gem install librarian-puppet-simple
+
+echo " ===> Installing Modules"
+cd /etc/puppet/
+librarian-puppet install --puppetfile=/vagrant/support/puppet/Puppetfile
 
 echo " ===> Configuring Hiera"
 rm /etc/hiera.yaml
@@ -31,13 +32,6 @@ echo " ===> and generating one if it doesnt."
 if [ ! -e "$(puppet config print hostcert)" ]; then
   puppet cert generate $(puppet config print certname)
 fi
-
-echo " ===> Installing Librarian Puppet Simple"
-gem install librarian-puppet-simple
-
-echo " ===> Installing Modules"
-cd /etc/puppet/
-librarian-puppet install --puppetfile=/etc/puppet/modules/site/ext/Puppetfile
 
 echo " ===> Installing PuppetDB"
 apt-get -y install puppetdb

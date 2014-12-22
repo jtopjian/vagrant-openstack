@@ -36,6 +36,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.vm.hostname = 'launchpad.example.com'
     vm.vm.provision 'shell', inline: "echo launchpad > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=launchpad > /etc/facter/facts.d/role.txt"
     vm.vm.provision 'shell', path: 'bootstraps/launchpad.sh'
   end
 
@@ -44,6 +45,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.hostmanager.aliases = ['puppet']
     vm.vm.provision 'shell', inline: "echo puppet > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=puppet_master > /etc/facter/facts.d/role.txt"
     vm.vm.provision 'shell', path: 'bootstraps/puppet.sh'
   end
 
@@ -52,6 +54,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.hostmanager.aliases = ['st2']
     vm.vm.provision 'shell', inline: 'echo st2 > /etc/hostname; hostname -F /etc/hostname'
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=stackstorm > /etc/facter/facts.d/role.txt"
+    vm.vm.provision 'shell', path: 'bootstraps/run_puppet.sh'
     vm.vm.provision 'shell', path: 'bootstraps/st2.sh'
   end
 
@@ -60,6 +64,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     vm.hostmanager.aliases = ['cloud']
     vm.vm.provision 'shell', inline: "echo cloud > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=cloud_controller > /etc/facter/facts.d/role.txt"
+    vm.vm.provision 'shell', path: 'bootstraps/run_puppet.sh'
   end
 
   config.vm.define 'c01' do |vm|
@@ -70,6 +76,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     vm.vm.provision 'shell', inline: "echo c01 > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=compute_node > /etc/facter/facts.d/role.txt"
+    vm.vm.provision 'shell', path: 'bootstraps/run_puppet.sh'
   end
 
   config.vm.define 'c02' do |vm|
@@ -80,6 +88,20 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
     vm.vm.provision 'shell', inline: "echo c02 > /etc/hostname; hostname -F /etc/hostname"
     vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=compute_node > /etc/facter/facts.d/role.txt"
+    vm.vm.provision 'shell', path: 'bootstraps/run_puppet.sh'
+  end
+
+  config.vm.define 'stacktach' do |vm|
+    vm.vm.hostname = 'stacktach.example.com'
+    vm.hostmanager.aliases = ['stacktach']
+    vm.vm.provider :openstack do |os|
+      os.flavor = 'm1.small'
+    end
+    vm.vm.provision 'shell', inline: "echo stacktach > /etc/hostname; hostname -F /etc/hostname"
+    vm.vm.provision 'shell', path: 'bootstraps/common.sh'
+    vm.vm.provision 'shell', inline: "echo role=stacktach > /etc/facter/facts.d/role.txt"
+    vm.vm.provision 'shell', path: 'bootstraps/run_puppet.sh'
   end
 
 end

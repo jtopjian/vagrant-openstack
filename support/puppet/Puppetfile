@@ -1,0 +1,90 @@
+forge 'http://forge.puppetlabs.com'
+
+mod 'apache',
+  :git => 'https://github.com/puppetlabs/puppetlabs-apache'
+  :ref => '1.2.0'
+
+mod 'apt',
+  :git => 'https://github.com/puppetlabs/puppetlabs-apt',
+  :ref => '1.7.0'
+
+mod 'concat',
+  :git => 'https://github.com/puppetlabs/puppetlabs-concat',
+  :ref => '1.1.2'
+
+mod 'cubbystack',
+  :git => 'https://github.com/jtopjian/puppet-cubbystack'
+
+mod 'firewall',
+  :git => 'https://github.com/puppetlabs/puppetlabs-firewall',
+  :ref => '1.2.0'
+
+mod 'hash2json',
+  :git => 'https://github.com/jtopjian/puppet-hash2json'
+
+mod 'icehouse',
+  :git => 'https://github.com/jtopjian/puppet-icehouse'
+
+mod 'inifile',
+  :git => 'https://github.com/puppetlabs/puppetlabs-inifile',
+  :ref => '792d35cdb48fc2cba08ab578c1b7bc42ef3a0ace'
+
+mod 'l2mesh',
+  :git => 'https://github.com/jtopjian/l2mesh'
+
+mod 'memcached',
+  :git => 'https://github.com/saz/puppet-memcached',
+  :ref => 'v2.6.0'
+
+mod 'mysql',
+  :git => 'https://github.com/puppetlabs/puppetlabs-mysql',
+  :ref => '3.0.0'
+
+mod 'postgresql',
+  :git => 'https://github.com/puppetlabs/puppetlabs-postgresql',
+  :ref => '4.1.0'
+
+mod 'puppet',
+  :git => 'https://github.com/jtopjian/puppet-puppet'
+
+mod 'puppetdb',
+  :git => 'https://github.com/puppetlabs/puppetlabs-puppetdb',
+  :ref => '4.1.0'
+
+mod 'puppetdbquery',
+  :git => 'https://github.com/dalen/puppet-puppetdbquery',
+  :ref => '1.5.3'
+
+mod 'python',
+  :git => 'https://github.com/stankevich/puppet-python',
+  :ref => '1.8.2'
+
+mod 'rabbitmq',
+  :git => 'https://github.com/puppetlabs/puppetlabs-rabbitmq',
+  :ref => '2.x'
+
+mod 'rsync',
+  :git => 'https://github.com/puppetlabs/puppetlabs-rsync',
+  :ref => '0.3.1'
+
+mod 'sshkeys',
+  :git => 'https://github.com/jtopjian/puppet-sshkeys'
+
+mod 'stdlib',
+  :git => 'https://github.com/puppetlabs/puppetlabs-stdlib',
+  :refe => '4.4.x'
+
+mod 'sysctl',
+  :git => 'https://github.com/puppetlabs/puppetlabs-sysctl'
+
+mod 'vcsrepo',
+  :git => 'http://github.com/puppetlabs/puppetlabs-vcsrepo',
+  :ref => '1.2.0'
+
+mod 'xinetd',
+  :git => 'https://github.com/puppetlabs/puppetlabs-xinetd',
+  :ref => '1.3.1'
+
+mod 'site',
+  :git => 'https://github.com/jtopjian/puppet-site',
+  :ref => 'icehouse'
