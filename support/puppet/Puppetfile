@@ -8,6 +8,9 @@ mod 'apt',
   :git => 'https://github.com/puppetlabs/puppetlabs-apt',
   :ref => '1.7.0'
 
+mod 'bass',
+  :git => 'https://github.com/jtopjian/puppet-bass'
+
 mod 'concat',
   :git => 'https://github.com/puppetlabs/puppetlabs-concat',
   :ref => '1.1.2'
