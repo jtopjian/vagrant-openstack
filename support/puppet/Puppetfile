@@ -1,7 +1,7 @@
 forge 'http://forge.puppetlabs.com'
 
 mod 'apache',
-  :git => 'https://github.com/puppetlabs/puppetlabs-apache'
+  :git => 'https://github.com/puppetlabs/puppetlabs-apache',
   :ref => '1.2.0'
 
 mod 'apt',
