@@ -20,7 +20,7 @@ mod 'cubbystack',
 
 mod 'firewall',
   :git => 'https://github.com/puppetlabs/puppetlabs-firewall',
-  :ref => '1.2.0'
+  :ref => '1.4.0'
 
 mod 'hash2json',
   :git => 'https://github.com/jtopjian/puppet-hash2json'

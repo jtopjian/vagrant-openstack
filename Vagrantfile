@@ -21,9 +21,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     os.keypair_name    = "launchpad"
     os.ssh_username    = "ubuntu"
     os.security_groups = ['default', 'openstack']
-    os.network         = 'cybera'
-    os.networks        = []
-    #os.address_id      = 'cybera'
+    os.address_id      = 'cybera'
   end
 
   # Vagrant Hostmanager
